@@ -1,7 +1,5 @@
 # Enterprise Network Lab — Cisco Packet Tracer
 
-![Network Topology](topology.png)
-
 A simulated enterprise network built in Cisco Packet Tracer, designed to reflect real-world mid-size company infrastructure. The project covers VLAN segmentation, inter-VLAN routing, DMZ architecture, OSPF dynamic routing, and ACL-based traffic control.
 
 ---
