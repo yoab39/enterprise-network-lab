@@ -1,99 +1,101 @@
 # Enterprise Network Lab — Cisco Packet Tracer
 
-![Network Topology](topologi.png)
+![Network Topology](Topologi.png)
 
-A simulated enterprise network built in Cisco Packet Tracer, designed to reflect real-world mid-size company infrastructure. The project covers VLAN segmentation, inter-VLAN routing, DMZ architecture, OSPF dynamic routing, and ACL-based traffic control.
+A small/medium business network built in Cisco Packet Tracer, demonstrating VLAN segmentation, inter-VLAN routing via a Layer 3 switch, and DHCP services. Built and iteratively corrected as part of ongoing CCNA study — see "Design History" below for what changed and why.
 
 ---
 
 ## Network Topology
-```
-                        [ R1 ]
-                       /      \
-                   [SW1]      [DMZ-SW]
-                /   / | \        |    |    |
-             SW2  SW3 SW4 SW5  Web  DNS  Mail
-              |    |   |   |
-            IT   HR  Sales Mgmt
-```
 
+                [ R1 ]
+                  |
+               [ SW1 ]  (L3 core — inter-VLAN routing via SVIs)
+      /    /    |    \    \
+   SW2   SW3   SW4   SW5  Server-SW
+    |     |     |     |      |  |  |
+   IT    HR   Sales  Mgmt  Web DNS Mail
+
+   
 ---
 
 ## VLAN Design
 
-| VLAN | Name       | Subnet          | Purpose                  |
-|------|------------|-----------------|--------------------------|
-| 10   | IT         | 10.10.10.0/24   | IT department clients    |
-| 20   | HR         | 10.10.20.0/24   | HR department clients    |
-| 30   | Sales      | 10.10.30.0/24   | Sales department clients |
-| 40   | Management | 10.10.40.0/24   | Network administration   |
-| 100  | DMZ        | 172.16.0.0/24   | Public-facing servers    |
+| VLAN | Name       | Subnet           | Purpose                        |
+|------|------------|------------------|---------------------------------|
+| 10   | IT         | 10.10.10.0/24    | IT department clients (DHCP)   |
+| 20   | HR         | 10.10.20.0/24    | HR department clients (DHCP)   |
+| 30   | Sales      | 10.10.30.0/24    | Sales department clients (DHCP)|
+| 40   | Management | 10.10.40.0/24    | Network admin clients (DHCP)   |
+| 100  | Servers    | 10.10.100.0/24   | Internal servers (static)      |
 
 ---
 
 ## Device Inventory
 
-| Device   | Model         | Role                        |
-|----------|---------------|-----------------------------|
-| R1       | Cisco 2911    | Edge router, DMZ gateway    |
-| SW1      | Cisco 3650    | L3 core switch, inter-VLAN  |
-| SW2      | Cisco 2960    | Access switch — IT          |
-| SW3      | Cisco 2960    | Access switch — HR          |
-| SW4      | Cisco 2960    | Access switch — Sales       |
-| SW5      | Cisco 2960    | Access switch — Management  |
-| DMZ-SW   | Cisco 2960    | Access switch — DMZ servers |
+| Device     | Model      | Role                                  |
+|------------|------------|----------------------------------------|
+| R1         | Cisco 2911 | Router — currently single uplink, no WAN edge configured |
+| SW1        | Cisco 3650 | L3 core switch — SVIs, inter-VLAN routing, DHCP server |
+| SW2        | Cisco 2960 | Access switch — IT                    |
+| SW3        | Cisco 2960 | Access switch — HR                    |
+| SW4        | Cisco 2960 | Access switch — Sales                 |
+| SW5        | Cisco 2960 | Access switch — Management            |
+| Server-SW  | Cisco 2960 | Access switch — internal servers      |
 
 ---
 
 ## Design Decisions
 
-**Collapsed Core (2-tier) Architecture**
-A full 3-tier design was intentionally avoided. Collapsed core is standard in mid-size enterprises (50–500 users) and is more representative of real-world environments at this scale.
+**Collapsed core, L3 switch as routing point**
+SW1 (3650, multilayer) performs inter-VLAN routing directly via SVIs — each VLAN's gateway lives on SW1, not on R1. R1's uplink to SW1 is a routed point-to-point link, not a trunk; R1 does not need to be VLAN-aware. This mirrors a standard small/medium business pattern where the router is reserved for the network edge and the L3 switch handles all internal routing.
 
-**L3 Switch as Core Routing Point**
-Inter-VLAN routing is handled by SW1 (Layer 3 switch) using SVIs, not by the edge router. This follows industry best practice — the router handles only external and DMZ traffic, while the L3 switch handles all internal routing.
+**Servers on their own VLAN, not per-department**
+Web, DNS, and Mail servers sit in VLAN100, statically addressed, rather than joining any single department's VLAN. This reflects that they're shared resources accessed across all departments, and keeps them addressable independently of user VLAN growth or changes.
 
-**Isolated DMZ**
-DMZ-SW connects directly to R1, not to SW1. This ensures the DMZ is isolated from the internal network. All traffic between internal VLANs and DMZ passes through R1, where ACLs can enforce strict access control.
+**DHCP handled by SW1 directly**
+Rather than a separate dedicated DHCP server, SW1 runs DHCP pools for VLAN10/20/30/40 itself, since it already owns every SVI as each VLAN's gateway. Servers (VLAN100) and infrastructure devices use static addressing.
 
-**Management VLAN Isolation**
-VLAN 40 is dedicated to network device management. VTY access on SW1 is restricted to VLAN 40 only, preventing unauthorized management access from other departments.
-
-**OSPF Dynamic Routing**
-OSPF (Area 0) is configured between R1 and SW1 to dynamically exchange routing information. This eliminates the need for manual static routes and reflects real enterprise routing practice.
+**No authentication currently configured**
+Console, VTY, and enable passwords have been intentionally removed on all devices for this lab so the file is immediately accessible to anyone reviewing it. This is a deliberate lab-accessibility choice, not a real-world security posture.
 
 ---
 
-## ACL Policy
+## Verification (tested and confirmed)
 
-| Rule | Source | Destination | Action |
-|------|--------|-------------|--------|
-| Block HR → IT | 10.10.20.0/24 | 10.10.10.0/24 | Deny |
-| Allow HTTP to DMZ | Any | 172.16.0.0/24 port 80 | Permit |
-| Allow DNS to DMZ | Any | 172.16.0.0/24 port 53 | Permit |
-| Block SSH to DMZ | Any | 172.16.0.0/24 port 22 | Deny |
-| Restrict VTY access | Non-VLAN40 | SW1 management | Deny |
+| Test | Result |
+|------|--------|
+| DHCP lease — all 4 user VLANs | Confirmed via `show ip dhcp binding` on SW1 |
+| Inter-VLAN ping (IT → HR) | Success |
+| Server-SW → internal servers | Success, after correcting VLAN100 membership |
+| SW1 inter-VLAN routing via SVI | Confirmed via `show ip interface brief` |
 
 ---
 
-## Verification
+## Design History — what changed and why
 
-| Test | Command | Expected Result |
-|------|---------|-----------------|
-| Inter-VLAN routing | `ping 10.10.20.10` from IT-PC1 | Success |
-| OSPF adjacency | `show ip ospf neighbor` on SW1 | Full state with R1 |
-| DMZ HTTP access | Web browser to 172.16.0.10 | Webpage loads |
-| HR blocked from IT | `ping 10.10.10.10` from HR-PC1 | Unreachable |
-| VTY restriction | `telnet 10.10.40.1` from HR-PC1 | Connection refused |
+This lab went through a corrective pass to fix issues from an earlier version:
+- **Renamed "DMZ-SW" to "Server-SW"** and moved it from R1 to SW1. The original design labeled the server segment a "DMZ" and connected it to R1, implying external accessibility — but there was no firewall or boundary control enforcing that, making the term misleading. It's now accurately described as an internal server segment.
+- **Corrected addressing documentation** — servers are on 10.10.100.0/24, not 172.16.0.0/24 as an earlier draft of this README incorrectly stated.
+- **Removed a lockout** — recovered console access via ROMMON password recovery after losing track of a configured password; used this as the reason to standardize on no-auth for lab accessibility going forward.
+
+---
+
+## Not Yet Implemented
+
+- WAN/internet edge on R1 (currently a single internal link only)
+- Redundancy — single router, single switch uplinks throughout (no HSRP/VRRP, no redundant trunks)
+- Firewall or ACL-based traffic control between segments
+- Dynamic routing protocol (currently static/directly-connected only)
+- Port security on access ports
 
 ---
 
 ## Skills Demonstrated
 
-- VLAN configuration and trunking (802.1Q)
-- Layer 3 switching and SVI configuration
-- OSPF dynamic routing
-- ACL design and implementation
-- DMZ network architecture
-- Network segmentation and security principles
+- VLAN configuration and 802.1Q trunking
+- Layer 3 switching and SVI-based inter-VLAN routing
+- DHCP pool configuration and troubleshooting (including diagnosing a missing local VLAN as the root cause of unreachable devices)
+- Cisco IOS password recovery (ROMMON, configuration register)
+- Design review and correction — identifying and fixing an architecturally misleading DMZ implementation
 - Cisco IOS CLI
