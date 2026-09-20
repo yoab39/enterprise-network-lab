@@ -2,7 +2,7 @@
 
 ![Network Topology](Topologi.png)
 
-A small/medium business network built in Cisco Packet Tracer, demonstrating VLAN segmentation, inter-VLAN routing via a Layer 3 switch, and DHCP services. Built as part of ongoing CCNA study.
+A small/medium business network built in Cisco Packet Tracer, demonstrating VLAN segmentation, inter-VLAN routing via a Layer 3 switch, and DHCP services. This is an ongoing project, built alongside CCNA study — new topics learned are applied back into this lab as they're covered, so the design and feature set will keep evolving over time.
 
 ---
 
@@ -33,15 +33,15 @@ A small/medium business network built in Cisco Packet Tracer, demonstrating VLAN
 
 ## Device Inventory
 
-| Device     | Model      | Role                                  |
+| Device     | Model      | Role                                  
 |------------|------------|----------------------------------------|
-| R1         | Cisco 2911 | Router — currently single uplink, no WAN edge configured |
-| SW1        | Cisco 3650 | L3 core switch — SVIs, inter-VLAN routing, DHCP server |
-| SW2        | Cisco 2960 | Access switch — IT                    |
-| SW3        | Cisco 2960 | Access switch — HR                    |
-| SW4        | Cisco 2960 | Access switch — Sales                 |
-| SW5        | Cisco 2960 | Access switch — Management            |
-| Server-SW  | Cisco 2960 | Access switch — internal servers      |
+| R1         | Cisco 2911 | Router — currently single uplink, no WAN edge configured 
+| SW1        | Cisco 3650 | L3 core switch — SVIs, inter-VLAN routing, DHCP server 
+| SW2        | Cisco 2960 | Access switch — IT                    
+| SW3        | Cisco 2960 | Access switch — HR                    
+| SW4        | Cisco 2960 | Access switch — Sales                 
+| SW5        | Cisco 2960 | Access switch — Management            
+| Server-SW  | Cisco 2960 | Access switch — internal servers      
 
 ---
 
@@ -72,11 +72,14 @@ Console, VTY, and enable passwords have been intentionally removed on all device
 
 ---
 
-## Not Yet Implemented
+## Planned / In Progress
 
+This lab will be extended as CCNA topics are covered. Planned additions include:
+
+- Spanning Tree Protocol tuning (root bridge selection, port roles)
+- ACL-based traffic control between VLANs and toward the server segment
 - WAN/internet edge on R1 (currently a single internal link only)
 - Redundancy — single router, single switch uplinks throughout (no HSRP/VRRP, no redundant trunks)
-- Firewall or ACL-based traffic control between segments
 - Dynamic routing protocol (currently static/directly-connected only)
 - Port security on access ports
 
