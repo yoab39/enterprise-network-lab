@@ -1,8 +1,8 @@
 # Enterprise Network Lab — Cisco Packet Tracer
 
-![Network Topology](Topologi.png)
+![Network Topology](topologi.png)
 
-A small/medium business network built in Cisco Packet Tracer, demonstrating VLAN segmentation, inter-VLAN routing via a Layer 3 switch, and DHCP services. Built and iteratively corrected as part of ongoing CCNA study — see "Design History" below for what changed and why.
+A small/medium business network built in Cisco Packet Tracer, demonstrating VLAN segmentation, inter-VLAN routing via a Layer 3 switch, and DHCP services. Built as part of ongoing CCNA study.
 
 ---
 
@@ -67,17 +67,8 @@ Console, VTY, and enable passwords have been intentionally removed on all device
 |------|--------|
 | DHCP lease — all 4 user VLANs | Confirmed via `show ip dhcp binding` on SW1 |
 | Inter-VLAN ping (IT → HR) | Success |
-| Server-SW → internal servers | Success, after correcting VLAN100 membership |
+| Server-SW → internal servers | Success |
 | SW1 inter-VLAN routing via SVI | Confirmed via `show ip interface brief` |
-
----
-
-## Design History — what changed and why
-
-This lab went through a corrective pass to fix issues from an earlier version:
-- **Renamed "DMZ-SW" to "Server-SW"** and moved it from R1 to SW1. The original design labeled the server segment a "DMZ" and connected it to R1, implying external accessibility — but there was no firewall or boundary control enforcing that, making the term misleading. It's now accurately described as an internal server segment.
-- **Corrected addressing documentation** — servers are on 10.10.100.0/24, not 172.16.0.0/24 as an earlier draft of this README incorrectly stated.
-- **Removed a lockout** — recovered console access via ROMMON password recovery after losing track of a configured password; used this as the reason to standardize on no-auth for lab accessibility going forward.
 
 ---
 
@@ -95,8 +86,6 @@ This lab went through a corrective pass to fix issues from an earlier version:
 
 - VLAN configuration and 802.1Q trunking
 - Layer 3 switching and SVI-based inter-VLAN routing
-- DHCP pool configuration and troubleshooting (including diagnosing a missing local VLAN as the root cause of unreachable devices)
+- DHCP pool configuration and troubleshooting
 - Cisco IOS password recovery (ROMMON, configuration register)
-- Design review and correction — identifying and fixing an architecturally misleading DMZ implementation
 - Cisco IOS CLI
-
