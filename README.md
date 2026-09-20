@@ -1,6 +1,6 @@
 # Enterprise Network Lab — Cisco Packet Tracer
 
-![Network Topology](topologi.png)
+![Network Topology](Topologi.png)
 
 A small/medium business network built in Cisco Packet Tracer, demonstrating VLAN segmentation, inter-VLAN routing via a Layer 3 switch, and DHCP services. Built as part of ongoing CCNA study.
 
